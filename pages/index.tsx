@@ -8,8 +8,8 @@ export default function Home() {
       <Head>
         <title>雨Ame</title>
       </Head>
-      <Link as={NextLink} href="/auth/sign-up"> 
-        Sign up
+      <Link as={NextLink} href="/auth/sign-up">
+        Sign Up
       </Link>
     </>
   );
