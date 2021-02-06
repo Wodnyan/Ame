@@ -5,11 +5,13 @@ import {
   Button,
   Flex,
   FormErrorMessage,
+  Text,
+  Link,
 } from "@chakra-ui/react";
-import Link from "next/link";
+import NextLink from "next/link";
 import { ChangeEvent, FormEvent, useState } from "react";
 import fire from "../../config/fire-config";
-import { signInSchema } from "../../validation-schemas/auth";
+import { authSchema } from "../../validation-schemas/auth";
 import { useRouter } from "next/router";
 
 interface SignUpCredentials {
@@ -24,7 +26,7 @@ export const SignUpForm = () => {
     email: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<any>({
+  const [errors, setErrors] = useState<SignUpCredentials>({
     email: "",
     password: "",
   });
@@ -34,7 +36,7 @@ export const SignUpForm = () => {
     try {
       setErrors({ email: "", password: "" });
       setIsLoading(true);
-      await signInSchema.validateAsync(userInfo, {
+      await authSchema.validateAsync(userInfo, {
         abortEarly: false,
       });
       await fire
@@ -49,7 +51,6 @@ export const SignUpForm = () => {
           ...prev,
           [key]: message,
         }));
-        console.log(message);
       });
     }
   };
@@ -63,35 +64,142 @@ export const SignUpForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <FormControl isInvalid={errors.email !== ""}>
-        <FormLabel>Email address</FormLabel>
-        <Input
-          id="email"
-          onChange={handleChange}
-          type="text"
-          value={userInfo.email}
-        />
-        <FormErrorMessage>{errors.email}</FormErrorMessage>
-      </FormControl>
-      <FormControl isInvalid={errors.password !== ""}>
-        <FormLabel>Password</FormLabel>
-        <Input
-          id="password"
-          onChange={handleChange}
-          type="password"
-          value={userInfo.password}
-        />
-        <FormErrorMessage>{errors.password}</FormErrorMessage>
-      </FormControl>
-      <Flex justifyContent="space-between" alignItems="center">
-        <Link href="/auth/login">
-          <a>Already have an account?</a>
-        </Link>
-        <Button isLoading={isLoading} type="submit">
-          Sign Up
-        </Button>
-      </Flex>
-    </form>
+    <>
+      <Text textAlign="center" fontSize="3em">
+        Sign up
+      </Text>
+      <form onSubmit={handleSubmit}>
+        <FormControl isInvalid={errors.email !== ""}>
+          <FormLabel>Email address</FormLabel>
+          <Input
+            id="email"
+            onChange={handleChange}
+            type="text"
+            value={userInfo.email}
+          />
+          <FormErrorMessage>{errors.email}</FormErrorMessage>
+        </FormControl>
+        <FormControl isInvalid={errors.password !== ""}>
+          <FormLabel>Password</FormLabel>
+          <Input
+            id="password"
+            onChange={handleChange}
+            type="password"
+            value={userInfo.password}
+          />
+          <FormErrorMessage>{errors.password}</FormErrorMessage>
+        </FormControl>
+        <Flex justifyContent="space-between" alignItems="center">
+          <NextLink href="/auth/login">
+            <Link textDecoration="underline" color="blue.500">
+              Create an account
+            </Link>
+          </NextLink>
+          <Button isLoading={isLoading} type="submit">
+            Sign Up
+          </Button>
+        </Flex>
+      </form>
+    </>
+  );
+};
+
+export const LoginForm = () => {
+  const router = useRouter();
+  const [userInfo, setUserInfo] = useState<SignUpCredentials>({
+    password: "",
+    email: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<SignUpCredentials>({
+    email: "",
+    password: "",
+  });
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      setErrors({
+        email: "",
+        password: "",
+      });
+      setIsLoading(true);
+      const validated = await authSchema.validateAsync(userInfo, {
+        abortEarly: false,
+      });
+      const userCreds = await fire
+        .auth()
+        .signInWithEmailAndPassword(validated.email, validated.password);
+      setIsLoading(false);
+      router.push("/todos");
+    } catch (error) {
+      setIsLoading(false);
+      if (error.code === "auth/user-not-found") {
+        setErrors((prev: any) => ({
+          ...prev,
+          email: "User not found",
+        }));
+      }
+      if (error.code === "auth/wrong-password") {
+        setErrors((prev: any) => ({
+          ...prev,
+          password: "Incorrect password",
+        }));
+      }
+      error.details?.map(({ message, context: { key } }) => {
+        setErrors((prev: any) => ({
+          ...prev,
+          [key]: message,
+        }));
+      });
+    }
+  };
+
+  const handleChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const { value, id } = e.target;
+    setUserInfo((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  return (
+    <>
+      <Text textAlign="center" fontSize="3em">
+        Login
+      </Text>
+      <form onSubmit={handleSubmit}>
+        <FormControl isInvalid={errors.email !== ""}>
+          <FormLabel>Email address</FormLabel>
+          <Input
+            id="email"
+            onChange={handleChange}
+            type="text"
+            value={userInfo.email}
+          />
+          <FormErrorMessage>{errors.email}</FormErrorMessage>
+        </FormControl>
+        <FormControl isInvalid={errors.password !== ""}>
+          <FormLabel>Password</FormLabel>
+          <Input
+            id="password"
+            onChange={handleChange}
+            type="password"
+            value={userInfo.password}
+          />
+          <FormErrorMessage>{errors.password}</FormErrorMessage>
+        </FormControl>
+        <Flex justifyContent="space-between" alignItems="center">
+          <NextLink href="/auth/sign-up">
+            <Link textDecoration="underline" color="blue.500">
+              Create an account
+            </Link>
+          </NextLink>
+          <Button isLoading={isLoading} type="submit">
+            Login
+          </Button>
+        </Flex>
+      </form>
+    </>
   );
 };

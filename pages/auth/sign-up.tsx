@@ -1,5 +1,5 @@
 import Head from "next/head";
-import {SignUpForm} from "../../components/Auth/AuthForm";
+import { SignUpForm } from "../../components/Auth/AuthForm";
 import { Box } from "@chakra-ui/react";
 
 const SignUp = () => {
