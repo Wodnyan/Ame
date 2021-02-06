@@ -1,7 +1,7 @@
 import fire from "../../config/fire-config";
 import { Todo } from "../../types/todo";
 
-export const getAllTodos = async (uid: string): Promise<Todo[] | []> => {
+export const fetchAllTodos = async (uid: string): Promise<Todo[] | []> => {
   const todosCollection = (await fire
     .firestore()
     .collection("todos")
@@ -15,4 +15,14 @@ export const getAllTodos = async (uid: string): Promise<Todo[] | []> => {
     });
   });
   return todos;
+};
+
+export const postTodo = async (todo: string, uid: string) => {
+  const newTodo = await fire.firestore().collection("todos").add({
+    todo,
+    completed: false,
+    userId: uid,
+  });
+  console.log(newTodo);
+  return newTodo;
 };

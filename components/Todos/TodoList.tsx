@@ -4,7 +4,7 @@ interface Props {
   todos: Todo[] | [];
 }
 
-const Todos: React.FC<Props> = ({ todos }) => {
+const TodoList: React.FC<Props> = ({ todos }) => {
   return (
     <ul>
       {(todos as Todo[]).map(({ todo, id }) => (
@@ -14,4 +14,4 @@ const Todos: React.FC<Props> = ({ todos }) => {
   );
 };
 
-export default Todos;
+export default TodoList;
