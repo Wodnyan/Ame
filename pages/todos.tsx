@@ -2,7 +2,7 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import fire from "../config/fire-config";
 import { useRouter } from "next/router";
-import { fetchAllTodos, postTodo } from "../lib/api/todos";
+import { fetchAllTodos, postTodo, updateTodo } from "../lib/api/todos";
 import { Todo } from "../types/todo";
 import TodoList from "../components/Todos/TodoList";
 import { Box, Spinner } from "@chakra-ui/react";
@@ -42,15 +42,31 @@ const TodosPage = () => {
     }
   }, [userUId]);
 
-  const handleSignOut = async () => {
-    await fire.auth().signOut();
-    router.push("/");
-  };
+  //const handleSignOut = async () => {
+  //await fire.auth().signOut();
+  //router.push("/");
+  //};
 
   const addTodo = async (todo: Todo) => {
     try {
       setTodos((prev) => [...prev, todo]);
-      const newTodo = await postTodo(todo.todo, userUId);
+      await postTodo(todo.todo, userUId);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const toggleTodoCompletedState = async (todoId: string) => {
+    try {
+      await updateTodo(todoId);
+      setTodos((prev) => {
+        return (prev as Todo[]).map((todo) => {
+          if (todo.id === todoId) {
+            todo.completed = !todo.completed;
+          }
+          return todo;
+        });
+      });
     } catch (error) {
       console.log(error);
     }
@@ -67,16 +83,18 @@ const TodosPage = () => {
         justifyContent="center"
         flexDirection="column"
         height="100%"
-        background="blue.500"
+        width="100%"
       >
         {isLoading ? (
           <Spinner />
         ) : (
-          <>
-            <h1>hello</h1>
-            <TodoList todos={todos} />
+          <Box maxWidth="500px">
+            <TodoList
+              toggleCompleted={toggleTodoCompletedState}
+              todos={todos}
+            />
             <TodoForm addTodo={addTodo} />
-          </>
+          </Box>
         )}
       </Box>
     </>

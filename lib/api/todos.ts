@@ -26,3 +26,11 @@ export const postTodo = async (todo: string, uid: string) => {
   console.log(newTodo);
   return newTodo;
 };
+
+export const updateTodo = async (todoId: string) => {
+  const temp = fire.firestore().collection("todos").doc(todoId);
+  const doc = (await temp.get()) as any;
+  const updated = await temp.update({
+    completed: !doc.completed,
+  });
+};

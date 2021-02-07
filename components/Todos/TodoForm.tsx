@@ -31,7 +31,7 @@ const TodoForm: React.FC<TodoFormProps> = ({ addTodo }) => {
           placeholder="todo"
           type="text"
         />
-        <Button>Add Todo</Button>
+        <Button>Add</Button>
       </FormControl>
     </form>
   );

@@ -1,16 +1,31 @@
-import { Todo } from "../../types/todo";
+import { Todo as TodoType } from "../../types/todo";
+import Todo from "./Todo";
+import { UnorderedList } from "@chakra-ui/react";
 
 interface Props {
-  todos: Todo[] | [];
+  todos: TodoType[] | [];
+  toggleCompleted: (todoId: string) => void;
 }
 
-const TodoList: React.FC<Props> = ({ todos }) => {
+const TodoList: React.FC<Props> = ({ todos, toggleCompleted }) => {
   return (
-    <ul>
-      {(todos as Todo[]).map(({ todo, id }) => (
-        <li key={id}>{todo}</li>
+    <UnorderedList
+      marginLeft={0}
+      overflow="auto"
+      height="md"
+      listStyleType="none"
+    >
+      {(todos as TodoType[]).map(({ todo, id, completed }) => (
+        <Todo
+          toggleCompleted={toggleCompleted}
+          completed={completed}
+          todoId={id}
+          key={id}
+        >
+          {todo}
+        </Todo>
       ))}
-    </ul>
+    </UnorderedList>
   );
 };
 
