@@ -19,6 +19,25 @@ interface SignUpCredentials {
   password: string;
 }
 
+const GoogleOAuthLoginButton = () => {
+  const router = useRouter();
+  const handleClick = () => {
+    const provider = new fire.auth.GoogleAuthProvider();
+    fire
+      .auth()
+      .signInWithPopup(provider)
+      .then(() => {
+        router.push("/todos");
+      })
+      .catch(console.log);
+  };
+  return (
+    <Button isFullWidth marginY={"1rem"} onClick={handleClick}>
+      Log in with Google
+    </Button>
+  );
+};
+
 export const SignUpForm = () => {
   const router = useRouter();
   const [userInfo, setUserInfo] = useState<SignUpCredentials>({
@@ -65,6 +84,7 @@ export const SignUpForm = () => {
 
   return (
     <>
+      <GoogleOAuthLoginButton />
       <Text textAlign="center" fontSize="3em">
         Sign up
       </Text>
@@ -92,7 +112,7 @@ export const SignUpForm = () => {
         <Flex justifyContent="space-between" alignItems="center">
           <NextLink href="/auth/login">
             <Link textDecoration="underline" color="blue.500">
-              Create an account
+              Sign in with your existing account
             </Link>
           </NextLink>
           <Button isLoading={isLoading} type="submit">
@@ -165,6 +185,7 @@ export const LoginForm = () => {
 
   return (
     <>
+      <GoogleOAuthLoginButton />
       <Text textAlign="center" fontSize="3em">
         Login
       </Text>
